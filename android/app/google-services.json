@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "413544048135",
+    "project_id": "acheev-89f7b",
+    "storage_bucket": "acheev-89f7b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:413544048135:android:875db9fc11b2a3b6a7aca2",
+        "android_client_info": {
+          "package_name": "com.example.acheev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "413544048135-5fmf3j2qi8nhc97irqpsb1ha167lfouj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxoapCOjdW6HxMJF-WJJk0mD2HslTvuiM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "413544048135-5fmf3j2qi8nhc97irqpsb1ha167lfouj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "413544048135-35neljatf9gua776reejvre4aapbo116.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.acheev"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
