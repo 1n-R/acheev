@@ -4,14 +4,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterPage extends StatefulWidget {
-  final VoidCallback showLoginPage;
-  const RegisterPage({Key? key, required this.showLoginPage}) : super(key: key);
+  const RegisterPage({super.key});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  // Declare
   final _passveriController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -38,17 +38,14 @@ class _RegisterPageState extends State<RegisterPage> {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim());
-      
+
       addUserDetails(_emailController.text.trim());
     }
   }
 
+  // ignore: non_constant_identifier_names
   Future addUserDetails(String Email) async {
-    await FirebaseFirestore.instance
-        .collection('users')
-        .add({'email': Email//, 'folder': []
-        });
-        // FirebaseFirestore.instance.collection('users').
+    await FirebaseFirestore.instance.collection('users').add({'email': Email});
   }
 
   bool passwordConfirmed() {
@@ -89,7 +86,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                 fontWeight: FontWeight.w500,
                                 fontSize: 26,
                               ),
-                              // textAlign: TextAlign.left,
                             )),
                       ],
                     )
@@ -98,9 +94,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // const SizedBox(
-                    //   height: 45,
-                    // ),
                     Row(
                       children: [
                         const SizedBox(
@@ -112,7 +105,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                 fontWeight: FontWeight.w400,
                                 fontSize: 14,
                               ),
-                              // textAlign: TextAlign.left,
                             ))
                       ],
                     ),
@@ -139,7 +131,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                   fontSize: 14,
                                   color: Color.fromRGBO(187, 187, 187, 1),
                                 ),
-                                // textAlign: TextAlign.left,
                               ),
                               fillColor: Colors.white,
                               filled: true),
@@ -155,7 +146,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                 fontWeight: FontWeight.w400,
                                 fontSize: 14,
                               ),
-                              // textAlign: TextAlign.left,
                             ))
                       ],
                     ),
@@ -168,14 +158,12 @@ class _RegisterPageState extends State<RegisterPage> {
                           decoration: InputDecoration(
                             suffixIcon: IconButton(
                                 icon: Icon(
-                                  // Based on passwordVisible state choose the icon
                                   _passwordVisible
                                       ? Icons.visibility
                                       : Icons.visibility_off,
                                   color: Theme.of(context).primaryColorDark,
                                 ),
                                 onPressed: () {
-                                  // Update the state i.e. toogle the state of passwordVisible variable
                                   setState(() {
                                     _passwordVisible = !_passwordVisible;
                                   });
@@ -197,7 +185,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                 fontSize: 14,
                                 color: Color.fromRGBO(187, 187, 187, 1),
                               ),
-                              // textAlign: TextAlign.left,
                             ),
                             fillColor: Colors.white,
                             filled: true,
@@ -214,7 +201,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                 fontWeight: FontWeight.w400,
                                 fontSize: 14,
                               ),
-                              // textAlign: TextAlign.left,
                             ))
                       ],
                     ),
@@ -227,14 +213,12 @@ class _RegisterPageState extends State<RegisterPage> {
                           decoration: InputDecoration(
                             suffixIcon: IconButton(
                                 icon: Icon(
-                                  // Based on passwordVisible state choose the icon
                                   _passwordVeriVisible
                                       ? Icons.visibility
                                       : Icons.visibility_off,
                                   color: Theme.of(context).primaryColorDark,
                                 ),
                                 onPressed: () {
-                                  // Update the state i.e. toogle the state of passwordVisible variable
                                   setState(() {
                                     _passwordVeriVisible =
                                         !_passwordVeriVisible;
@@ -257,7 +241,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                 fontSize: 14,
                                 color: Color.fromRGBO(187, 187, 187, 1),
                               ),
-                              // textAlign: TextAlign.left,
                             ),
                             fillColor: Colors.white,
                             filled: true,
@@ -266,26 +249,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     const SizedBox(
                       height: 15,
                     ),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   children: [
-                    //     const Text(
-                    //       'Have an account?',
-                    //       style: TextStyle(
-                    //         fontWeight: FontWeight.bold,
-                    //       ),
-                    //     ),
-                    //     GestureDetector(
-                    //         onTap: widget.showLoginPage,
-                    //         child: const Text(
-                    //           ' Login',
-                    //           style: TextStyle(
-                    //             color: Color.fromRGBO(248, 54, 0, 1),
-                    //             fontWeight: FontWeight.bold,
-                    //           ),
-                    //         ))
-                    //   ],
-                    // ),
+                    
                     const SizedBox(
                       height: 51,
                     ),

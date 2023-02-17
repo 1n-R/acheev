@@ -30,10 +30,9 @@ class AcheevMain extends StatelessWidget {
     return MaterialApp(
       title: 'Acheev',
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.orange,
       ),
       debugShowCheckedModeBanner: false,
-      // login: const MyHomePage(title: 'Acheev'),
       home: const MainPage(),
     );
   }

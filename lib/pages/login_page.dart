@@ -1,18 +1,20 @@
+import 'package:acheev/pages/register_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
-  final VoidCallback showRegisterPage;
-  const LoginPage({Key? key, required this.showRegisterPage}) : super(key: key);
+  const LoginPage({super.key});
+
+
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // text controllers
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _passwordVisible = false;
@@ -66,7 +68,6 @@ class _LoginPageState extends State<LoginPage> {
                                 fontWeight: FontWeight.w500,
                                 fontSize: 26,
                               ),
-                              // textAlign: TextAlign.left,
                             )),
                       ],
                     )
@@ -75,9 +76,6 @@ class _LoginPageState extends State<LoginPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // const SizedBox(
-                    //   height: 45,
-                    // ),
                     Row(
                       children: [
                         const SizedBox(
@@ -89,7 +87,6 @@ class _LoginPageState extends State<LoginPage> {
                                 fontWeight: FontWeight.w400,
                                 fontSize: 14,
                               ),
-                              // textAlign: TextAlign.left,
                             ))
                       ],
                     ),
@@ -115,7 +112,6 @@ class _LoginPageState extends State<LoginPage> {
                                   fontWeight: FontWeight.w400,
                                   fontSize: 14,
                                 ),
-                                // textAlign: TextAlign.left,
                               ),
                               fillColor: Colors.white,
                               filled: true),
@@ -131,7 +127,6 @@ class _LoginPageState extends State<LoginPage> {
                                 fontWeight: FontWeight.w400,
                                 fontSize: 14,
                               ),
-                              // textAlign: TextAlign.left,
                             ))
                       ],
                     ),
@@ -144,14 +139,12 @@ class _LoginPageState extends State<LoginPage> {
                           decoration: InputDecoration(
                             suffixIcon: IconButton(
                                 icon: Icon(
-                                  // Based on passwordVisible state choose the icon
                                   _passwordVisible
                                       ? Icons.visibility
                                       : Icons.visibility_off,
                                   color: Theme.of(context).primaryColorDark,
                                 ),
                                 onPressed: () {
-                                  // Update the state i.e. toogle the state of passwordVisible variable
                                   setState(() {
                                     _passwordVisible = !_passwordVisible;
                                   });
@@ -172,7 +165,6 @@ class _LoginPageState extends State<LoginPage> {
                                 fontWeight: FontWeight.w400,
                                 fontSize: 14,
                               ),
-                              // textAlign: TextAlign.left,
                             ),
                             fillColor: Colors.white,
                             filled: true,
@@ -192,10 +184,13 @@ class _LoginPageState extends State<LoginPage> {
                                 fontWeight: FontWeight.w400,
                                 fontSize: 14,
                               ),
-                              // textAlign: TextAlign.left,
                             )),
                         GestureDetector(
-                            onTap: widget.showRegisterPage,
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context){
+                                return const RegisterPage();
+                              }));
+                            },
                             child: Text(' Register',
                                 style: GoogleFonts.poppins(
                                   textStyle: const TextStyle(
@@ -203,7 +198,6 @@ class _LoginPageState extends State<LoginPage> {
                                     fontSize: 14,
                                     color: Color.fromRGBO(248, 54, 0, 1),
                                   ),
-                                  // textAlign: TextAlign.left,
                                 )))
                       ],
                     ),
