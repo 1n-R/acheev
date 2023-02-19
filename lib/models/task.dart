@@ -1,19 +1,19 @@
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 
 class Task {
   String? id;
-  IconData? iconData;
   String? title;
-  Color? bgColor;
-  Color? iconColor;
-  num? notes;
+  String? description;
+  String? insert;
+  DateTime? date;
+  bool? isnull = true;
 
   Task({
     this.id,
-    this.iconData,
     this.title,
-    this.bgColor,
-    this.iconColor,
-    this.notes,
+    this.description,
+    this.insert,
+    this.date,
+    this.isnull
   });
 }

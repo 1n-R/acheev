@@ -1,11 +1,13 @@
-import 'package:acheev/pages/tasks_page.dart';
+import 'package:acheev/pages/foldertasks_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:acheev/models/task.dart';
-import 'package:acheev/constants/colors.dart';
+import 'package:acheev/models/foldertask.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+// import 'package:acheev/constants/colors.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,7 +20,11 @@ class _HomePageState extends State<HomePage> {
   final user = FirebaseAuth.instance.currentUser!;
   final _newtaskController = TextEditingController();
   String iduser = '';
-  List<Task> allTasks = [];
+  List<FolderTask> allFolderTasks = [];
+  int lengthFolderTasks = 0;
+  Color bgcolor = Colors.blue;
+  Color iconcolor = Colors.white;
+  late Color color;
 
   // GET USER
   Future getIdUser() async {
@@ -36,7 +42,11 @@ class _HomePageState extends State<HomePage> {
         .collection('users/')
         .doc(iduser)
         .collection('/tasks')
-        .add({'name': _newtaskController.text.trim()});
+        .add({
+      'name': _newtaskController.text.trim(),
+      'iconColor': 0xFFC0D3F8,
+      'bgColor': 0xFFF08A8E
+    });
 
     _newtaskController.clear();
   }
@@ -68,8 +78,24 @@ class _HomePageState extends State<HomePage> {
     _newtaskController.clear();
   }
 
+  // GET LENGTH FOLDER TASK
+  // Future getlengthfoldertask(iduser, idtask) async {
+  //   int lengthFolderTasks = 0;
+  //   lengthFolderTasks = await FirebaseFirestore.instance
+  //       .collection('users/')
+  //       .doc(iduser)
+  //       .collection('/tasks')
+  //       .doc(idtask)
+  //       .collection('task')
+  //       .snapshots()
+  //       .length;
+
+  //   print(lengthFolderTasks);
+  // }
+
   // GET ALL FOLDER TASK
-  Future getallTasks() async {
+  Future getallFolderTasks() async {
+    allFolderTasks = [];
     await getIdUser();
     await FirebaseFirestore.instance
         .collection('users/')
@@ -78,95 +104,181 @@ class _HomePageState extends State<HomePage> {
         .get()
         // ignore: avoid_function_literals_in_foreach_calls
         .then((task) => task.docs.forEach((element) {
-              allTasks.add(Task(
+              // element.reference.parent.
+              // await getlengthfoldertask(iduser, element.id);
+              // int length;
+              // print (await element.reference.collection('task').get().then((value) => ));
+              // print(element['task'] ? element['task'] : 0);
+              // Future<int> countProducts() async {
+              //   AggregateQuerySnapshot query = await element.reference.collection('task').count().get();
+              //   debugPrint('The number of products: ${query.count}');
+              //   return query.count;
+              // }
+
+              // AggregateQuerySnapshot query =
+              //     await element.reference.collection('task').count().get();
+              // debugPrint('The number of products: ${query.count}');
+              // print(await element.reference.collection('task').count().get());
+
+              allFolderTasks.add(FolderTask(
                 id: element.id,
                 iconData: Icons.folder_copy,
                 title: element['name'].toString(),
-                bgColor: kBlueLight,
-                iconColor: kBlueDark,
-                notes: 7,
+                bgColor: Color(element['bgColor']),
+                iconColor: Color(element['iconColor']),
+                notes: 0,
               ));
             }));
   }
 
-  // Dialog CREATE
-  Future addFolderView() {
-    return showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: Text('Add Folder',
-                  style: GoogleFonts.poppins(
-                    textStyle: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 24,
-                        color: Color.fromRGBO(248, 54, 0, 1)),
-                  )),
-              content: TextField(
-                controller: _newtaskController,
-                autofocus: true,
-                decoration: const InputDecoration(hintText: 'Folder name'),
-              ),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      setState(() {
-                        allTasks = [];
-                        addFoldercontroller();
-                        Navigator.pop(context, 'Create');
-                      });
-                    },
-                    child: const Text('Create')),
-                // TextButton(onPressed: () {}, child: Text('Create')),
-              ],
-            ));
-  }
-
-  // Dialog Edit
+  // Dialog
   Future editFolderView(String id, String nameFolder) {
-    var newText = nameFolder;
+    String title;
+    bool create;
+    bool update;
+    bool delete;
 
     _newtaskController.value = _newtaskController.value.copyWith(
-      text: newText,
-      selection: TextSelection.collapsed(offset: newText.length),
+      text: nameFolder,
+      selection: TextSelection.collapsed(offset: nameFolder.length),
     );
+
+    if (id != '' && nameFolder != '') {
+      title = 'Edit';
+      create = false;
+      update = true;
+      delete = true;
+    } else {
+      title = 'Add';
+      create = true;
+      update = false;
+      delete = false;
+    }
 
     return showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text('Edit Folder',
+              title: Text('$title Folder',
                   style: GoogleFonts.poppins(
                     textStyle: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 24,
-                        color: Color.fromRGBO(248, 54, 0, 1)),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 24,
+                      color: Color.fromRGBO(0, 0, 0, 1)
+                    ),
                   )),
               content: TextField(
                 controller: _newtaskController,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(9),
+                ],
                 autofocus: true,
                 decoration: const InputDecoration(hintText: 'Folder name'),
               ),
               actions: [
-                TextButton(
-                    onPressed: () {
-                      setState(() {
-                        allTasks = [];
-                        deleteFoldercontroller(id);
-                        Navigator.pop(context, 'Delete');
-                      });
-                    },
-                    child: const Text('Delete')),
-                TextButton(
-                    onPressed: () {
-                      setState(() {
-                        allTasks = [];
-                        updateFoldercontroller(id, nameFolder);
-                        Navigator.pop(context, 'Update');
-                      });
-                    },
-                    child: const Text('Update')),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            // pickbgColor(context);
+                          },
+                          child: Container(
+                            // color: Colors.black,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: bgcolor),
+
+                            // alignment: Alignment.center,
+
+                            height: 30,
+                            width: 30,
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        GestureDetector(
+                          child: Container(
+                            // decoration: BoxDecoration(
+                            //     borderRadius: BorderRadius.circular(5)),
+                            // alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: Colors.black),
+                            height: 30,
+                            width: 30,
+                          ),
+                        ),
+                        // GestureDetector()
+                      ],
+                    ),
+                    Visibility(
+                      visible: delete,
+                      child: TextButton(
+                          onPressed: () {
+                            setState(() {
+                              // allFolderTasks = [];
+                              deleteFoldercontroller(id);
+                              Navigator.pop(context, 'Delete');
+                            });
+                          },
+                          child: const Text('Delete')),
+                    ),
+                    Visibility(
+                      visible: update,
+                      child: TextButton(
+                          onPressed: () {
+                            setState(() {
+                              // allFolderTasks = [];
+                              updateFoldercontroller(id, nameFolder);
+                              Navigator.pop(context, 'Update');
+                            });
+                          },
+                          child: const Text('Update')),
+                    ),
+                    Visibility(
+                      visible: create,
+                      child: TextButton(
+                          onPressed: () {
+                            setState(() {
+                              // allFolderTasks = [];
+                              addFoldercontroller();
+                              Navigator.pop(context, 'Create');
+                            });
+                          },
+                          child: const Text('Create')),
+                    ),
+                  ],
+                ),
               ],
             ));
   }
+
+  void pickbgColor(BuildContext context) => showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: const Text('Pick Your Color'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                buildColorPicker(),
+                TextButton(
+                    onPressed: () {
+                      // print(color);
+                      setState(() {
+                        bgcolor = color;
+                        // print(bgcolor);
+                      });
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      'Select',
+                      style: TextStyle(fontSize: 20),
+                    ))
+              ],
+            ),
+          ));
 
   @override
   void dispose() {
@@ -195,60 +307,56 @@ class _HomePageState extends State<HomePage> {
               )),
           Expanded(
               child: FutureBuilder(
-            future: getallTasks(),
+            future: getallFolderTasks(),
             builder: (context, snapshot) {
               return GridView.builder(
                   padding: const EdgeInsets.all(10),
-                  itemCount: allTasks.length,
+                  itemCount: allFolderTasks.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10),
                   itemBuilder: (context, index) =>
-                      _buildTask(context, allTasks[index]));
+                      _buildTask(context, allFolderTasks[index]));
             },
           )),
-          GestureDetector(
-              onTap: () {
-                FirebaseAuth.instance.signOut();
-              },
-              child: Text(
-                user.email.toString(),
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                  color: Color.fromRGBO(248, 54, 0, 1),
-                ),
-              ))
         ],
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-        elevation: 0,
-        child: Container(
-          height: 60,
-          width: 60,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(50),
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: <Color>[
-                Color.fromRGBO(254, 140, 0, 1),
-                Color.fromRGBO(248, 54, 0, 1),
-              ],
+      floatingActionButton: SizedBox(
+        height: 64,
+        width: 64,
+        child: FittedBox(
+          child: FloatingActionButton(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+            elevation: 0,
+            child: Container(
+              height: 64,
+              width: 64,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                gradient: const LinearGradient(
+                  begin: Alignment.center,
+                  end: Alignment(1.0, 0.0),
+                  colors: <Color>[
+                    Color.fromRGBO(254, 140, 0, 1),
+                    Color.fromRGBO(248, 54, 0, 1),
+                  ],
+                ),
+              ),
+              child: const Icon(
+                Icons.add,
+                size: 30,
+                color: Colors.white,
+              ),
             ),
-          ),
-          child: const Icon(
-            Icons.add,
-            size: 30,
+            onPressed: () {
+              editFolderView('', '');
+            },
           ),
         ),
-        onPressed: () {
-          addFolderView();
-        },
       ),
     );
   }
@@ -271,7 +379,7 @@ class _HomePageState extends State<HomePage> {
               backgroundColor: Colors.white,
               showSelectedLabels: false,
               showUnselectedLabels: false,
-              selectedItemColor: Colors.blueAccent,
+              selectedItemColor: const Color.fromRGBO(239, 67, 44, 1),
               unselectedItemColor: Colors.grey.withOpacity(0.5),
               items: const [
                 BottomNavigationBarItem(
@@ -311,23 +419,27 @@ class _HomePageState extends State<HomePage> {
             width: 190,
           ),
           SizedBox(
-            height: 40,
-            width: 40,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset('assets/avatar.png'),
-            ),
-          ),
+              height: 40,
+              width: 40,
+              child: GestureDetector(
+                onTap: () {
+                  FirebaseAuth.instance.signOut();
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset('assets/avatar.png'),
+                ),
+              )),
         ],
       ),
     );
   }
 
-  Widget _buildTask(BuildContext context, Task task) {
+  Widget _buildTask(BuildContext context, FolderTask task) {
     return GestureDetector(
       onTap: () =>
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return TasksPage(task.id.toString(), iduser.toString());
+        return FolderTasksPage(task.id.toString(), iduser.toString());
       })),
       child: Container(
         padding: const EdgeInsets.all(20),
@@ -347,22 +459,20 @@ class _HomePageState extends State<HomePage> {
                       color: task.iconColor,
                       size: 35,
                     ),
-                    TextButton(
-                      style: ButtonStyle(
-                        alignment: Alignment.topRight,
-                        foregroundColor:
-                            MaterialStateProperty.all<Color>(Colors.black),
-                      ),
-                      onPressed: () {
+                    GestureDetector(
+                      onTap: () {
                         editFolderView(
                             task.id.toString(), task.title.toString());
                       },
                       child: const Icon(
                         Icons.more_vert,
-                        size: 20,
+                        size: 25,
                       ),
-                    ),
+                    )
                   ],
+                ),
+                const SizedBox(
+                  height: 10,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -381,8 +491,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _buildTaskStatus(
-                    task.bgColor!, task.iconColor!, '${task.notes} notes'),
+                _buildTaskStatus(task.bgColor!, '${task.notes} notes'),
               ],
             )
           ],
@@ -391,15 +500,23 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildTaskStatus(Color bgColor, Color txColor, String text) {
+  Widget _buildTaskStatus(Color bgColor, String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
           color: bgColor, borderRadius: BorderRadius.circular(20)),
       child: Text(
         text,
-        style: TextStyle(color: txColor),
+        style: GoogleFonts.poppins(
+          textStyle: const TextStyle(
+              fontWeight: FontWeight.w400,
+              fontSize: 14,
+              color: Color.fromRGBO(0, 0, 0, 0.5)),
+        ),
       ),
     );
   }
+
+  Widget buildColorPicker() => ColorPicker(
+      pickerColor: bgcolor, onColorChanged: (bgcolor) => color = bgcolor);
 }

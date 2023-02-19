@@ -2,208 +2,147 @@
 // import 'dart:ui' as ui;
 
 // import 'package:acheev/constants/colors.dart';
+// import 'dart:html';
+
+import 'package:acheev/pages/task_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+
+import '../models/task.dart';
 // import 'package:intl/intl.dart';
 
-class TasksPage extends StatefulWidget {
-  final String idTask;
+class FolderTasksPage extends StatefulWidget {
+  final String idFolderTask;
   final String idUser;
-  const TasksPage(this.idTask, this.idUser, {super.key});
+  const FolderTasksPage(this.idFolderTask, this.idUser, {super.key});
 
   @override
   // ignore: no_logic_in_create_state
-  State<TasksPage> createState() => _TasksPageState(idTask, idUser);
+  State<FolderTasksPage> createState() =>
+      // ignore: no_logic_in_create_state
+      _FolderTasksPageState(idFolderTask, idUser);
 }
 
-class _TasksPageState extends State<TasksPage> {
-  final String idTask;
+class _FolderTasksPageState extends State<FolderTasksPage> {
+  final String idFolderTask;
   final String idUser;
-  _TasksPageState(this.idTask, this.idUser);
+  _FolderTasksPageState(this.idFolderTask, this.idUser);
 
+  List<Task> allTask = [];
   String nameTasks = '';
-  Future getallTasks() async {
+
+  Future getnameFolderTask() async {
     await FirebaseFirestore.instance
         .collection('users/')
         .doc(idUser)
         .collection('/tasks')
-        .doc(idTask)
+        .doc(idFolderTask)
         .get()
         .then((value) {
+      value.reference.collection('task').get().then((task) => null);
       setState(() {
         nameTasks = value['name'];
       });
     });
-    // ignore: avoid_function_literals_in_foreach_calls
-    // .then((task) => task.docs.forEach((element) {
-    //       allTasks.add(Task(
-    //         id: element.id,
-    //         iconData: Icons.folder_copy,
-    //         title: element['name'].toString(),
-    //         bgColor: kBlueLight,
-    //         iconColor: kBlueDark,
-    //         notes: 7,
-    //       ));
-    //       // print(element["name"]);
-    // }
-    // ));
-    // return allTasks;
+  }
+
+  Future getallTasks() async {
+    allTask = [];
+    // await getIdUser();
+    await FirebaseFirestore.instance
+        .collection('users/')
+        .doc(idUser)
+        .collection('/tasks/')
+        .doc(idFolderTask)
+        .collection('/task')
+        .get()
+        // ignore: avoid_function_literals_in_foreach_calls
+        .then((task) => task.docs.forEach((element) {
+              // int task =
+              //     await element.reference.collection('task').snapshots().length;
+              // print(element);
+              allTask.add(Task(
+                  id: element.id,
+                  title: element['title'].toString(),
+                  description: element['description'].toString(),
+                  insert: element['insert'].toString(),
+                  date: DateTime.parse(element['date'].toString()),
+                  isnull: false));
+            }));
   }
 
   @override
   void initState() {
-    getallTasks();
+    getnameFolderTask();
+    // setState(() {
+    //   allTask = [];
+    // });
+    // getallTasks();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: _buildAppBar(),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-                child: ListView.builder(
-              itemCount: 40,
-              itemBuilder: (context, index) {
-                return Container(
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                          offset: Offset.fromDirection(0, 10),
-                          blurRadius: 10.0,
-                          color: const Color.fromRGBO(0, 0, 0, 0.02)
-                          // blurStyle: BlurStyle.solid
-                          // spreadRadius: 100.0,
-                          ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15.0, vertical: 11.0),
-                    child: Container(
-                      // color: Colors.red,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white),
-                      // margin: EdgeInsets.all(10),
-                      // color: Colors.white,
-                      child: GestureDetector(
-                        // onTap: signIn,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Image.asset(
-                              'assets/taskImage.png',
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  // crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: const [
-                                    Icon(
-                                      Icons.more_vert,
-                                      color: Colors.black,
-                                      size: 25,
-                                    ),
-                                  ],
-                                ),
-                                const Text('School website project'),
-                                const Text('Deadline Oct, 28'),
-                                const Icon(
-                                  Icons.access_time_filled,
-                                  color: Colors.black,
-                                  size: 19.0,
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            )),
-          ],
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: FloatingActionButton(
-          isExtended: true,
-          onPressed: () {
-            // Add your onPressed code here!
-          },
-          backgroundColor: const Color.fromRGBO(254, 140, 0, 1),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          child: GestureDetector(
-            // onTap: signIn,
-            child: Container(
-              // padding: const EdgeInsets.all(1),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: <Color>[
-                    Color.fromRGBO(254, 140, 0, 1),
-                    Color.fromRGBO(248, 54, 0, 1),
-                  ],
-                ),
-              ),
-              child: Center(
-                child: Text('Add Task',
-                    style: GoogleFonts.poppins(
-                      textStyle: const TextStyle(
-                          color: Color.fromARGB(255, 255, 255, 255),
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15),
-                    )),
-              ),
+      backgroundColor: Colors.white,
+      appBar: _buildAppBar(),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+              child: FutureBuilder(
+            future: getallTasks(),
+            builder: (context, snapshot) {
+              return ListView.builder(
+                  itemCount: allTask.length,
+                  itemBuilder: (context, index) =>
+                      _buildTask(context, allTask[index]));
+            },
+          )),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton.extended(
+        extendedPadding: const EdgeInsets.all(0),
+        onPressed: () async {
+          await Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return AddTask(idFolderTask, idUser, Task());
+          }));
+          setState(() {
+            allTask = [];
+          });
+          // print('cek');
+        },
+        // backgroundColor: const Color.fromRGBO(254, 140, 0, 1),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        label: Container(
+          // margin: EdgeInsets,
+          alignment: Alignment.center,
+          height: 50,
+          // padding: const EdgeInsets.all(1),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: <Color>[
+                Color.fromRGBO(254, 140, 0, 1),
+                Color.fromRGBO(248, 54, 0, 1),
+              ],
             ),
           ),
-        )
-        // extended(
-        //   onPressed: () {
-        //     // Add your onPressed code here!
-        //   },
-        //   backgroundColor: const Color.fromRGBO(254, 140, 0, 1),
-        //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        //   label: GestureDetector(
-        //     // onTap: signIn,
-        //     child: Container(
-        //       // padding: const EdgeInsets.all(1),
-        //       decoration: BoxDecoration(
-        //         borderRadius: BorderRadius.circular(5),
-        //         gradient: const LinearGradient(
-        //           begin: Alignment.topLeft,
-        //           end: Alignment.bottomRight,
-        //           colors: <Color>[
-        //             Color.fromRGBO(254, 140, 0, 1),
-        //             Color.fromRGBO(248, 54, 0, 1),
-        //           ],
-        //         ),
-        //       ),
-        //       child: Center(
-        //         child: Text('Add Task',
-        //             style: GoogleFonts.poppins(
-        //               textStyle: const TextStyle(
-        //                   color: Color.fromARGB(255, 255, 255, 255),
-        //                   fontWeight: FontWeight.w600,
-        //                   fontSize: 15),
-        //             )),
-        //       ),
-        //     ),
-        //   ),
-        // ),
-        );
+          child: Text('  Add Task  ',
+              style: GoogleFonts.poppins(
+                textStyle: const TextStyle(
+                    color: Color.fromARGB(255, 255, 255, 255),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15),
+              )),
+        ),
+      ),
+    );
   }
 
   AppBar _buildAppBar() {
@@ -251,11 +190,88 @@ class _TasksPageState extends State<TasksPage> {
       ],
     );
   }
+
+  Widget _buildTask(BuildContext context, Task alltask) {
+    {
+      return Container(
+        padding: const EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+                offset: Offset.fromDirection(0, 10),
+                blurRadius: 10.0,
+                color: const Color.fromRGBO(0, 0, 0, 0.02)
+                // blurStyle: BlurStyle.solid
+                // spreadRadius: 100.0,
+                ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 11.0),
+          child: Container(
+            // color: Colors.red,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10), color: Colors.white),
+            // margin: EdgeInsets.all(10),
+            // color: Colors.white,
+            child: GestureDetector(
+              // onTap: signIn,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      await Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return AddTask(idFolderTask, idUser, alltask);
+                      }));
+                      setState(() {
+                        allTask = [];
+                      });
+                      // print('cek');
+                    },
+                    child: const Icon(
+                      Icons.more_vert,
+                      color: Colors.black,
+                      size: 25,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Image.asset(
+                        'assets/taskImage.png',
+                      ),
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(alltask.title.toString()),
+                          Text(
+                              'Deadline ${DateFormat('MMM, dd').format(alltask.date!)}'),
+                          const Icon(
+                            Icons.access_time_filled,
+                            color: Colors.black,
+                            size: 19.0,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+  }
 }
-// class TasksPage extends StatelessWidget {
+// class FolderTasksPage extends StatelessWidget {
 //   final String idTask;
 //   final String idUser;
-//   const TasksPage(this.idTask, this.idUser, {super.key});
+//   const FolderTasksPage(this.idTask, this.idUser, {super.key});
 
 //   // final String a;
 //   // static const String title= '';
