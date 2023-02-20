@@ -45,7 +45,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // ignore: non_constant_identifier_names
   Future addUserDetails(String Email) async {
-    await FirebaseFirestore.instance.collection('users').add({'email': Email});
+    await FirebaseFirestore.instance
+        .collection('users')
+        .add({'email': Email, 'lastidalarm': 1});
   }
 
   bool passwordConfirmed() {
@@ -249,7 +251,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     const SizedBox(
                       height: 15,
                     ),
-                    
                     const SizedBox(
                       height: 51,
                     ),

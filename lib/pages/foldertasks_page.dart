@@ -4,6 +4,7 @@
 // import 'package:acheev/constants/colors.dart';
 // import 'dart:html';
 
+import 'package:acheev/pages/detailtask_page.dart';
 import 'package:acheev/pages/task_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -64,12 +65,15 @@ class _FolderTasksPageState extends State<FolderTasksPage> {
               //     await element.reference.collection('task').snapshots().length;
               // print(element);
               allTask.add(Task(
-                  id: element.id,
-                  title: element['title'].toString(),
-                  description: element['description'].toString(),
-                  insert: element['insert'].toString(),
-                  date: DateTime.parse(element['date'].toString()),
-                  isnull: false));
+                id: element.id,
+                title: element['title'].toString(),
+                description: element['description'].toString(),
+                insert: element['insert'].toString(),
+                date: DateTime.parse(element['date'].toString()),
+                isnull: false,
+                idalarm: element['idalarm'],
+                isalarm: element['isalarm'],
+              ));
             }));
   }
 
@@ -191,75 +195,115 @@ class _FolderTasksPageState extends State<FolderTasksPage> {
     );
   }
 
-  Widget _buildTask(BuildContext context, Task alltask) {
+  Widget _buildTask(BuildContext context, Task task) {
     {
-      return Container(
-        padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-                offset: Offset.fromDirection(0, 10),
-                blurRadius: 10.0,
-                color: const Color.fromRGBO(0, 0, 0, 0.02)
-                // blurStyle: BlurStyle.solid
-                // spreadRadius: 100.0,
-                ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 11.0),
-          child: Container(
-            // color: Colors.red,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10), color: Colors.white),
-            // margin: EdgeInsets.all(10),
-            // color: Colors.white,
+      return GestureDetector(
+        child: Container(
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                  offset: Offset.fromDirection(0, 10),
+                  blurRadius: 10.0,
+                  color: const Color.fromRGBO(0, 0, 0, 0.02)
+                  // blurStyle: BlurStyle.solid
+                  // spreadRadius: 100.0,
+                  ),
+            ],
+          ),
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 15.0, vertical: 11.0),
             child: GestureDetector(
-              // onTap: signIn,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      await Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return AddTask(idFolderTask, idUser, alltask);
-                      }));
-                      setState(() {
-                        allTask = [];
-                      });
-                      // print('cek');
-                    },
-                    child: const Icon(
-                      Icons.more_vert,
-                      color: Colors.black,
-                      size: 25,
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return DetailTask(task);
+                }));
+              },
+              child: Container(
+                // color: Colors.red,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white),
+                // margin: EdgeInsets.all(10),
+                // color: Colors.white,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        await Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return AddTask(idFolderTask, idUser, task);
+                        }));
+                        setState(() {
+                          allTask = [];
+                        });
+                        // print('cek');
+                      },
+                      child: const Icon(
+                        Icons.more_vert,
+                        color: Colors.black,
+                        size: 25,
+                      ),
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Image.asset(
-                        'assets/taskImage.png',
-                      ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(alltask.title.toString()),
-                          Text(
-                              'Deadline ${DateFormat('MMM, dd').format(alltask.date!)}'),
-                          const Icon(
-                            Icons.access_time_filled,
-                            color: Colors.black,
-                            size: 19.0,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Image.asset(
+                          'assets/taskImage.png',
+                        ),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              task.title.toString(),
+                              style: GoogleFonts.poppins(
+                                textStyle: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 15,
+                                    color: Color.fromRGBO(60, 64, 72, 1)),
+                              ),
+                            ),
+                            Text(
+                              'Deadline ${DateFormat('MMM, dd').format(task.date!)}',
+                              style: GoogleFonts.poppins(
+                                textStyle: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 15,
+                                    color: Color.fromRGBO(60, 64, 72, 1)),
+                              ),
+                            ),
+                            Visibility(
+                              visible: task.isalarm as bool,
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.access_time_filled,
+                                    color: Colors.black,
+                                    size: 19.0,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    DateFormat('HH : mm').format(task.date!),
+                                    style: GoogleFonts.poppins(
+                                      textStyle: const TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 15,
+                                          color: Color.fromRGBO(60, 64, 72, 1)),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'firebase_options.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 // import 'package:google_fonts/google_fonts.dart';
@@ -8,16 +8,41 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'auth/main_page.dart';
 
-void main() async {
-  // WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  var initializationSettingAndroid =
+      const AndroidInitializationSettings('codex_logo');
+
+  var initializationSettingIOS = IOSInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
+    onDidReceiveLocalNotification: (int id, String? title, String? body,String? payload) async {},
+  );
+
+  var initializationSettings = InitializationSettings(
+      android: initializationSettingAndroid, iOS: initializationSettingIOS);
+
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onSelectNotification: (String? payload) async {
+      if (payload != null) {
+        debugPrint('notification payload $payload');
+      }
+    },
+  );
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FlutterNativeSplash.preserve(
       widgetsBinding: WidgetsFlutterBinding.ensureInitialized());
   FlutterNativeSplash.remove();
+
   runApp(const AcheevMain());
 }
 
