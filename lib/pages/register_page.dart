@@ -1,3 +1,4 @@
+import 'package:acheev/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,6 +18,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _passwordController = TextEditingController();
   bool _passwordVisible = false;
   bool _passwordVeriVisible = false;
+  bool _passwordconfirm = true;
 
   @override
   void dispose() {
@@ -40,6 +42,13 @@ class _RegisterPageState extends State<RegisterPage> {
           password: _passwordController.text.trim());
 
       addUserDetails(_emailController.text.trim());
+
+      Route route = MaterialPageRoute(builder: (context) => HomePage());
+      Navigator.pushReplacement(context, route);
+    } else {
+      setState(() {
+        _passwordconfirm = false;
+      });
     }
   }
 
@@ -227,13 +236,17 @@ class _RegisterPageState extends State<RegisterPage> {
                                   });
                                 }),
                             enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: Color.fromRGBO(187, 187, 187, 0.35)),
+                              borderSide: BorderSide(
+                                  color: _passwordconfirm
+                                      ? Color.fromRGBO(187, 187, 187, 0.35)
+                                      : Color.fromRGBO(255, 0, 0, 0.349)),
                               borderRadius: BorderRadius.circular(5),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: Color.fromRGBO(187, 187, 187, 1)),
+                              borderSide: BorderSide(
+                                  color: _passwordconfirm
+                                      ? Color.fromRGBO(187, 187, 187, 1)
+                                      : Color.fromRGBO(255, 0, 0, 0.349)),
                               borderRadius: BorderRadius.circular(5),
                             ),
                             hintText: 'Enter Verification Password',

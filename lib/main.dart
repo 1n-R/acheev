@@ -21,7 +21,8 @@ void main() async {
     requestAlertPermission: true,
     requestBadgePermission: true,
     requestSoundPermission: true,
-    onDidReceiveLocalNotification: (int id, String? title, String? body,String? payload) async {},
+    onDidReceiveLocalNotification:
+        (int id, String? title, String? body, String? payload) async {},
   );
 
   var initializationSettings = InitializationSettings(
